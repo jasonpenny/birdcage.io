@@ -2,6 +2,7 @@ import json
 import urllib2
 
 HTTPError = urllib2.HTTPError
+URLError = urllib2.URLError
 
 def post_json(url, data):
     req = urllib2.Request(url)

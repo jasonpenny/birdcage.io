@@ -81,3 +81,24 @@ def set_target_temperature_single(unique_id):
                                          rec['port'])
 
     return jsonify(success=True)
+
+@app.route('/v1/target_temperature/thermostats', methods=['POST'])
+def set_target_temperature_all():
+    data = request.get_json()
+
+    if not data or \
+       not data.get('temperature'):
+        return (
+            jsonify(success=False,
+                    error="temperature field is required"),
+            400)
+
+    db = get_db()
+    cur = db.execute('SELECT * FROM thermostats '
+                     'WHERE  online = 1 ')
+    for rec in cur.fetchall():
+        update_thermostat_target_temperature(data['temperature'],
+                                             rec['ip_address'],
+                                             rec['port'])
+
+    return jsonify(success=True)
