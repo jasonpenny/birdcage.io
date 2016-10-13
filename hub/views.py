@@ -1,4 +1,5 @@
 from hub import app, get_db, jsonify, request, IntegrityError
+from hub.thermostat_api import update_thermostat_target_temperature
 
 @app.route('/v1/thermostats', methods=['GET'])
 def list_thermostats():
@@ -53,3 +54,30 @@ def add_thermostat():
     db.commit()
 
     return (jsonify(success=True), 201)
+
+@app.route('/v1/target_temperature/thermostats/<unique_id>', methods=['POST'])
+def set_target_temperature_single(unique_id):
+    data = request.get_json()
+
+    if not data or \
+       not data.get('temperature'):
+        return (
+            jsonify(success=False,
+                    error="temperature field is required"),
+            400)
+
+    db = get_db()
+    cur = db.execute('SELECT * FROM thermostats '
+                     'WHERE  id = ?',
+                     [unique_id])
+    rec = cur.fetchone()
+    if not rec:
+        return (jsonify(success=False,
+                        error='Not Found'),
+                404)
+
+    update_thermostat_target_temperature(data['temperature'],
+                                         rec['ip_address'],
+                                         rec['port'])
+
+    return jsonify(success=True)
