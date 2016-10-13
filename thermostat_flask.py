@@ -1,7 +1,9 @@
 import json
+import os
 import sys
 
 from thermostat.setup import find_unused_port, register_with_hub
+from thermostat import app, init_db
 from lib.http_requests import HTTPError
 
 HUB_IP_ADDRESS = '127.0.0.1'
@@ -24,3 +26,14 @@ except HTTPError as err:
     print response['error']
 
     exit(2)
+
+app.config.update(
+    DATABASE=os.path.join(app.root_path, '%s.db' % port))
+
+# clear out database if it existed from a previous run
+if os.path.isfile(app.config['DATABASE']):
+    os.remove(app.config['DATABASE'])
+
+init_db(unique_id)
+
+app.run(port=port)
