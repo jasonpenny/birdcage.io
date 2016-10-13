@@ -25,11 +25,16 @@ def add_thermostat():
         db.execute('INSERT INTO thermostats (id, ip_address, port, online) '
                    'VALUES (?, ?, ?, 1)',
                    [data['id'], data['ip_address'], data['port']])
-        db.commit()
     except IntegrityError:
-        return (
-            jsonify(success=False,
-                    error="'id' [%s] already exists" % data['id']),
-            409)
+        db.execute(
+            'UPDATE thermostats '
+            '   SET ip_address = ?, '
+            '       port = ?, '
+            '       online = 1 '
+            'WHERE  id = ?',
+            [data['ip_address'], data['port'],
+             data['id']])
+
+    db.commit()
 
     return (jsonify(success=True), 201)
