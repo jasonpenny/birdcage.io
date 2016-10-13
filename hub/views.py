@@ -4,8 +4,23 @@ from hub import app, get_db, jsonify, request, IntegrityError
 def list_thermostats():
     db = get_db()
     cur = db.execute('SELECT * FROM thermostats')
-    entries = [dict(row) for row in cur.fetchall()]
+    entries = [{"id": row['id'],
+                "online": row['online']}
+               for row in cur.fetchall()]
     return jsonify(entries)
+
+@app.route('/v1/thermostats/<unique_id>', methods=['GET'])
+def get_thermostat(unique_id):
+    db = get_db()
+    cur = db.execute('SELECT * FROM thermostats '
+                     'WHERE  id = ?',
+                     [unique_id])
+    rec = cur.fetchone()
+    if not rec:
+        return (jsonify(success=False,
+                        error='Not Found'),
+                404)
+    return jsonify(dict(rec))
 
 @app.route('/v1/thermostats', methods=['POST'])
 def add_thermostat():
