@@ -5,6 +5,11 @@ from flask import Flask, g, jsonify, request
 app = Flask(__name__)
 app.config.from_object(__name__)
 
+app.config.update(
+    JSONIFY_PRETTYPRINT_REGULAR=False)
+
+app.json_encoder.item_separator = ','
+app.json_encoder.key_separator = ':'
 
 def connect_db():
     rv = sqlite3.connect(app.config['DATABASE'])

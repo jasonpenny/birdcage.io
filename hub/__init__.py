@@ -7,7 +7,11 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 app.config.update(
-    DATABASE=os.path.join(app.root_path, 'hub.db'))
+    DATABASE=os.path.join(app.root_path, 'hub.db'),
+    JSONIFY_PRETTYPRINT_REGULAR=False)
+
+app.json_encoder.item_separator = ','
+app.json_encoder.key_separator = ':'
 
 
 def connect_db():
