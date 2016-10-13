@@ -6,3 +6,22 @@ def general_info():
     cur = db.execute('SELECT * FROM info')
     info = cur.fetchone()
     return jsonify(dict(info))
+
+@app.route('/nickname', methods=['POST'])
+def update_nickname():
+    data = request.get_json()
+
+    if not data or \
+       not data.get('nickname'):
+        return (
+            jsonify(success=False,
+                    error="'nickname' field is required"),
+            400)
+
+    db = get_db()
+    db.execute('UPDATE info '
+               '   SET nickname = ?',
+               [data['nickname']])
+    db.commit()
+
+    return jsonify(success=True)
