@@ -1,12 +1,31 @@
 import random
-from thermostat import app, get_db, jsonify, request, IntegrityError
+from thermostat import app, get_db, jsonify, request
+
+def get_current_temperature():
+    """
+    As there is no actual hardware available,
+    simulate the current room temperature with a random value between 65-75F
+    """
+    return random.randint(65, 75)
 
 @app.route('/')
 def general_info():
     db = get_db()
     cur = db.execute('SELECT * FROM info')
-    info = cur.fetchone()
-    return jsonify(dict(info))
+    info = dict(cur.fetchone())
+
+    info['current_temperature'] = get_current_temperature()
+
+    cur = db.execute(
+        'SELECT temperature '
+        'FROM   target_temperatures '
+        'ORDER BY id DESC '
+        'LIMIT 1')
+    rec = cur.fetchone()
+    if rec:
+        info['current_target_temperature'] = rec['temperature']
+
+    return jsonify(info)
 
 @app.route('/nickname', methods=['POST'])
 def update_nickname():
@@ -29,8 +48,7 @@ def update_nickname():
 
 @app.route('/current_temperature')
 def current_temperature():
-    temp = random.randint(65, 75)
-    return jsonify(temperature=temp)
+    return jsonify(temperature=get_current_temperature())
 
 @app.route('/target_temperatures/current', methods=['GET'])
 def get_current_target_temperature():

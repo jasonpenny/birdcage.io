@@ -1,6 +1,6 @@
 from hub import app, get_db, jsonify, request, IntegrityError
 from hub.thermostat_api import update_thermostat_target_temperature, \
-        get_thermostat_current_temperature
+        get_thermostat_current_temperature, get_thermostat_info
 
 @app.route('/v1/thermostats', methods=['GET'])
 def list_thermostats():
@@ -22,7 +22,20 @@ def get_thermostat(unique_id):
         return (jsonify(success=False,
                         error='Not Found'),
                 404)
-    return jsonify(dict(rec))
+
+    info = dict(rec)
+
+    details = get_thermostat_info(rec['ip_address'], rec['port'])
+    if details:
+        fields_to_copy = {k:v for k, v in details.iteritems()
+                          if k in ['nickname',
+                                   'current_temperature',
+                                   'current_target_temperature']}
+        info.update(fields_to_copy)
+    else:
+        info['online'] = 0
+
+    return jsonify(info)
 
 @app.route('/v1/thermostats', methods=['POST'])
 def add_thermostat():
