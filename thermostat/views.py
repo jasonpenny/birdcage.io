@@ -1,3 +1,4 @@
+import random
 from thermostat import app, get_db, jsonify, request, IntegrityError
 
 @app.route('/')
@@ -25,3 +26,8 @@ def update_nickname():
     db.commit()
 
     return jsonify(success=True)
+
+@app.route('/current_temperature')
+def current_temperature():
+    temp = random.randint(65, 75)
+    return jsonify(temperature=temp)
