@@ -24,7 +24,7 @@ Adds a new registered thermostat
 
 **example request**
 
-    { "id": "[unique_id]", "ip": "X.X.X.X", "port": 8044 }
+    { "id": "[unique_id]", "ip_address": "X.X.X.X", "port": 8044 }
 
 #### POST /v1/target_temperature/thermostats
 
