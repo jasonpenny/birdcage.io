@@ -1,5 +1,6 @@
 from hub import app, get_db, jsonify, request, IntegrityError
-from hub.thermostat_api import update_thermostat_target_temperature
+from hub.thermostat_api import update_thermostat_target_temperature, \
+        get_thermostat_current_temperature
 
 @app.route('/v1/thermostats', methods=['GET'])
 def list_thermostats():
@@ -102,3 +103,19 @@ def set_target_temperature_all():
                                              rec['port'])
 
     return jsonify(success=True)
+
+@app.route('/v1/current_temperature/thermostats')
+def get_averate_thermostat_current_temperature():
+    db = get_db()
+    cur = db.execute('SELECT * FROM thermostats '
+                     'WHERE  online = 1 ')
+
+    all_temps = []
+    for rec in cur.fetchall():
+        temp = get_thermostat_current_temperature(rec['ip_address'],
+                                                  rec['port'])
+        if temp is not None:
+            all_temps.append(temp)
+
+    avg_temp = sum(all_temps) / len(all_temps)
+    return jsonify(average_temperature=avg_temp)

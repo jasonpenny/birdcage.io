@@ -42,7 +42,7 @@ Sets the target temperature for a single thermostat for the given `:id` value
 
     { "temperature": 65 }
 
-#### GET /v1/current_temperature
+#### GET /v1/current_temperature/thermostats
 
 Returns the average current room temperature across all registered thermostats
 
