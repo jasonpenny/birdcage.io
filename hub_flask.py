@@ -12,4 +12,4 @@ if not os.path.isfile(app.config['DATABASE']):
 CheckThermostatsConnectivity(interval=120,
                              database=app.config['DATABASE'])
 
-app.run(port=3000)
+app.run(host='0.0.0.0', port=3000)

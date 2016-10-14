@@ -11,8 +11,10 @@ def find_unused_port():
 
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.bind(('localhost', port))
-            addr, _ = s.getsockname()
             s.close()
+
+            # find non-loopback IP
+            addr = socket.gethostbyname(socket.gethostname())
 
             return addr, port
         except socket.error:

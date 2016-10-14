@@ -34,4 +34,4 @@ app.config.update(
 if not os.path.isfile(app.config['DATABASE']):
     init_db(unique_id)
 
-app.run(port=port)
+app.run(host='0.0.0.0', port=port)
