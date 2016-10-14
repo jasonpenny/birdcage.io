@@ -1,5 +1,8 @@
 import random
-from thermostat import app, get_db, jsonify, request
+from thermostat import app, jsonify, request
+from thermostat.db import get_info, update_info_nickname, \
+        get_latest_target_temperature, get_all_target_temperatures, \
+        add_target_temperature
 
 def get_current_temperature():
     """
@@ -10,18 +13,11 @@ def get_current_temperature():
 
 @app.route('/')
 def general_info():
-    db = get_db()
-    cur = db.execute('SELECT * FROM info')
-    info = dict(cur.fetchone())
+    info = dict(get_info())
 
     info['current_temperature'] = get_current_temperature()
 
-    cur = db.execute(
-        'SELECT temperature '
-        'FROM   target_temperatures '
-        'ORDER BY id DESC '
-        'LIMIT 1')
-    rec = cur.fetchone()
+    rec = get_latest_target_temperature()
     if rec:
         info['current_target_temperature'] = rec['temperature']
 
@@ -38,11 +34,7 @@ def update_nickname():
                     error="'nickname' field is required"),
             400)
 
-    db = get_db()
-    db.execute('UPDATE info '
-               '   SET nickname = ?',
-               [data['nickname']])
-    db.commit()
+    update_info_nickname(data['nickname'])
 
     return jsonify(success=True)
 
@@ -52,13 +44,7 @@ def current_temperature():
 
 @app.route('/target_temperatures/current', methods=['GET'])
 def get_current_target_temperature():
-    db = get_db()
-    cur = db.execute(
-        'SELECT temperature '
-        'FROM   target_temperatures '
-        'ORDER BY id DESC '
-        'LIMIT 1')
-    rec = cur.fetchone()
+    rec = get_latest_target_temperature()
     if not rec:
         return jsonify(temperature=None)
 
@@ -75,19 +61,11 @@ def set_current_target_temperature():
                     error="'temperature' field is required"),
             400)
 
-    db = get_db()
-    db.execute('INSERT INTO target_temperatures (temperature)'
-               'VALUES (?)',
-               [data['temperature']])
-    db.commit()
+    add_target_temperature(data['temperature'])
 
     return jsonify(success=True)
 
 @app.route('/target_temperatures')
 def get_target_temperature_history():
-    db = get_db()
-    cur = db.execute('SELECT temperature '
-                     'FROM   target_temperatures '
-                     'ORDER BY id ')
-    entries = [dict(row) for row in cur.fetchall()]
+    entries = [dict(row) for row in get_all_target_temperatures()]
     return jsonify(entries)
