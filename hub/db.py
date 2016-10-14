@@ -1,15 +1,18 @@
 from hub import get_db, IntegrityError
 
-def mark_thermostat_as_offline(thermostat_id):
-    db = get_db()
+def mark_thermostat_as_offline(thermostat_id, db=None):
+    if db is None:
+        db = get_db()
+
     db.execute('UPDATE thermostats '
                '   SET online = 0 '
                'WHERE  id = ?',
                [thermostat_id])
     db.commit()
 
-def get_all_thermostats(online_only=False):
-    db = get_db()
+def get_all_thermostats(online_only=False, db=None):
+    if db is None:
+        db = get_db()
 
     if online_only:
         sql = 'SELECT * FROM thermostats WHERE online = 1'

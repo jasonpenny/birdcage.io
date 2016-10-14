@@ -36,7 +36,8 @@ def get_thermostat_current_temperature(thermostat_id,
 
 def get_thermostat_info(thermostat_id,
                         thermostat_ip_address,
-                        thermostat_port):
+                        thermostat_port,
+                        db=None):
     url = 'http://{host}:{port}/' \
             .format(host=thermostat_ip_address,
                     port=thermostat_port)
@@ -44,6 +45,6 @@ def get_thermostat_info(thermostat_id,
     try:
         return get_json(url)
     except (HTTPError, URLError):
-        mark_thermostat_as_offline(thermostat_id)
+        mark_thermostat_as_offline(thermostat_id, db=db)
 
         return None
