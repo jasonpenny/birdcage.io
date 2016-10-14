@@ -25,7 +25,7 @@ def get_thermostat(unique_id):
 
     info = dict(rec)
 
-    details = get_thermostat_info(rec['ip_address'], rec['port'])
+    details = get_thermostat_info(rec['id'], rec['ip_address'], rec['port'])
     if details:
         fields_to_copy = {k:v for k, v in details.iteritems()
                           if k in ['nickname',
@@ -91,6 +91,7 @@ def set_target_temperature_single(unique_id):
                 404)
 
     update_thermostat_target_temperature(data['temperature'],
+                                         rec['id'],
                                          rec['ip_address'],
                                          rec['port'])
 
@@ -112,6 +113,7 @@ def set_target_temperature_all():
                      'WHERE  online = 1 ')
     for rec in cur.fetchall():
         update_thermostat_target_temperature(data['temperature'],
+                                             rec['id'],
                                              rec['ip_address'],
                                              rec['port'])
 
@@ -125,7 +127,8 @@ def get_averate_thermostat_current_temperature():
 
     all_temps = []
     for rec in cur.fetchall():
-        temp = get_thermostat_current_temperature(rec['ip_address'],
+        temp = get_thermostat_current_temperature(rec['id'],
+                                                  rec['ip_address'],
                                                   rec['port'])
         if temp is not None:
             all_temps.append(temp)
