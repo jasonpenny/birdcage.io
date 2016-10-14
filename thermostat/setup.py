@@ -1,3 +1,4 @@
+import base64
 import random
 import socket
 
@@ -26,3 +27,6 @@ def register_with_hub(hub_ip_address, hub_port,
             "port": thermostat_port}
 
     post_json(url, data)
+
+def safe_filename(unsafe):
+    return base64.urlsafe_b64encode(unsafe)

@@ -2,7 +2,7 @@ import json
 import os
 import sys
 
-from thermostat.setup import find_unused_port, register_with_hub
+from thermostat.setup import find_unused_port, register_with_hub, safe_filename
 from thermostat import app, init_db
 from lib.http_requests import HTTPError
 
@@ -28,12 +28,10 @@ except HTTPError as err:
     exit(2)
 
 app.config.update(
-    DATABASE=os.path.join(app.root_path, '%s.db' % port))
+    DATABASE=os.path.join(app.root_path, '%s.db' % safe_filename(unique_id)))
 
-# clear out database if it existed from a previous run
-if os.path.isfile(app.config['DATABASE']):
-    os.remove(app.config['DATABASE'])
-
-init_db(unique_id)
+# create database if doesn't exist yet
+if not os.path.isfile(app.config['DATABASE']):
+    init_db(unique_id)
 
 app.run(port=port)
